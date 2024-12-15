@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Search</title>
+    <style>
+        img {
+            width: 150px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Yandex and DuckDuckGo Image Search</h1>
+    <input type="text" id="query" placeholder="Enter search term" />
+    <button onclick="searchImages()">Search</button>
+
+    <h2>Yandex Images</h2>
+    <div id="yandex-images"></div>
+
+    <h2>DuckDuckGo Images</h2>
+    <div id="duckduckgo-images"></div>
+
+    <script>
+        function searchImages() {
+            const query = document.getElementById('query').value;
+            fetch('http://127.0.0.1:3000/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: query }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const yandexImagesDiv = document.getElementById('yandex-images');
+                const duckduckgoImagesDiv = document.getElementById('duckduckgo-images');
+                
+                yandexImagesDiv.innerHTML = '';  // Clear previous images
+                duckduckgoImagesDiv.innerHTML = '';  // Clear previous images
+
+                if (data.error) {
+                    yandexImagesDiv.innerHTML = `<p>${data.error}</p>`;
+                } else {
+                    // Display Yandex Images
+                    data.yandex_images.forEach(imgUrl => {
+                        const img = document.createElement('img');
+                        img.src = imgUrl;
+                        yandexImagesDiv.appendChild(img);
+                    });
+
+                    // Display DuckDuckGo Images
+                    data.duckduckgo_images.forEach(imgUrl => {
+                        const img = document.createElement('img');
+                        img.src = imgUrl;
+                        duckduckgoImagesDiv.appendChild(img);
+                    });
+                }
+            })
+            .catch(err => console.error(err));
+        }
+    </script>
+</body>
+</html>
